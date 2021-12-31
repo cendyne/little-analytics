@@ -8,6 +8,7 @@
         "Expires" "0"
         "Cache-Control" "no-cache, no-store, must-revalidate"
         "Pragma" "no-cache"
+        "Accept-CH" "Viewport-Width, Width, DPR, Sec-CH-UA-Full-Version-List"
     }
     :body transparent
     :status 200
