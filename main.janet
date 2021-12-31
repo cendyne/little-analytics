@@ -46,7 +46,7 @@
         (def fake-query (get (uri/parse fake-uri) :query))
         (put request :cookies fake-query))
     
-    (each header ["Connection" "Accept" "Accept-Encoding" "Accept-Language" "Cookie" "X-Forwarded-Proto" "X-Forwarded-Ssl" "X-Request-Start" "cdn-loop" "cf-ray" "cf-visitor" "Upgrade-Insecure-Requests" "Cache-Control" "User-Agent" "Host" "Content-Type" "Content-Length"]
+    (each header ["Connection" "Accept" "Accept-Encoding" "Accept-Language" "Cookie" "X-Forwarded-For" "X-Forwarded-Proto" "X-Forwarded-Ssl" "X-Request-Start" "cdn-loop" "cf-ray" "cf-visitor" "Upgrade-Insecure-Requests" "Cache-Control" "User-Agent" "Host" "Content-Type" "Content-Length"]
         (put headers (string/ascii-lower header) nil)
         (put headers header nil))
     (put request :headers headers)
