@@ -8,6 +8,7 @@ RUN jpm build && jpm build
 
 FROM alpine as app
 COPY --from=builder /little-analytics/build/little-analytics /usr/local/bin/
-COPY db static /opt/
+COPY db /opt/db
+COPY static /opt/static
 WORKDIR /opt/
 CMD ["little-analytics"]

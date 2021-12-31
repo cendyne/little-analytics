@@ -1,5 +1,5 @@
--- up
-create table events (
+CREATE TABLE schema_migrations (version text primary key)
+CREATE TABLE events (
   `id` integer primary key autoincrement,
   `date` real not null,
   `ip` text,
@@ -11,6 +11,5 @@ create table events (
   `body_content_type` text,
   `headers` text
 )
-
--- down
-drop table events
+CREATE TABLE sqlite_sequence(name,seq)
+CREATE INDEX events_date on events(date)

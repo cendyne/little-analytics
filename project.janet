@@ -9,6 +9,8 @@
     "https://github.com/cendyne/janet-html.git"
     "https://github.com/janet-lang/sqlite3.git"
     "https://github.com/joy-framework/db.git"
+    "https://github.com/janet-lang/json.git"
+    {:repo "https://github.com/cendyne/janet-uri.git" :tag "8ef191236e20bec64a72db2508df4693b9bd1cc0"}
     ]
   )
 
