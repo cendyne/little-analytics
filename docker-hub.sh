@@ -1,6 +1,7 @@
 set -e
 # Too many platforms and it'll run out of memory..
-PLATFORMS="linux/amd64,linux/arm64"
+# Commenting out arm64 because it'll take too long right now
+PLATFORMS="linux/amd64"
 DATE=$(date '+%Y-%m-%dT%H:%M:%S')
 
 if [ -z "$GITHUB_SHA" ]; then
