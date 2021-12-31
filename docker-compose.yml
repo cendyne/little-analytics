@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  little-analytics:
+    build: .
+    image: cendyne/little-analytics:latest
+    volumes:
+      - little-analytics:/data
+    environment:
+      PORT: 8003
+      HOST: "0.0.0.0"
+      AUTH_TOKEN: example-token
+      DATABASE_URL: /data/db.sqlite3
+    ports:
+      - "8003:8003"
+volumes:
+  little-analytics: {}
