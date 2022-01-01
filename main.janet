@@ -17,8 +17,8 @@
     :body transparent
     :status 200
 })
-(defn app
-    [connection request]
+
+(defn pixel-handler [connection request]
     (def uri (get request :uri))
     (def query (get (uri/parse uri) :query))
     (def request (merge request {:query query}))
@@ -56,45 +56,72 @@
     (put request :uri nil)
     (def method (get request :method))
     (put request :method nil)
-    (def path (get request :path))
+    (var path (get request :path))
     (put request :path nil)
     (def date (os/clock))
     (def cookies (get request :cookies))
     (put request :cookies nil)
+    (var host nil)
+    (def second-slash (string/find "/" path 1))
+    (when-let [second-slash (string/find "/" path 1)]
+        (set host (string/slice path 1 second-slash))
+        (set path (string/slice path second-slash)))
 
-    (cond
-        (= "/favicon.ico" path)
-        {
-            :status 404
-            :body ""
-        }
-        (do
-            (printf "%f %s %s %s" date ip method path)
-            (db/insert :events {
-                :date date
-                :ip ip
-                :method method
-                :user-agent user-agent
-                :path path
-                :cookies (when cookies (json/encode cookies))
-                :body (when body (json/encode body))
-                :body-content-type content-type
-                :headers (json/encode headers)
-            })
-            respond-transparent
-        ))
-    
+    (printf "%f %s %s %s" date ip method path)
+    (db/insert :events {
+        :date date
+        :ip ip
+        :method method
+        :user-agent user-agent
+        :path path
+        :cookies (when cookies (json/encode cookies))
+        :body (when body (json/encode body))
+        :body-content-type content-type
+        :headers (json/encode headers)
+        :host host
+    })
+    respond-transparent
 )
+(defn handle-404 []
+    {
+        :status 404
+        :body ""
+    })
+(def unresolveable-paths [
+    "/favicon.ico"
+    "/robots.txt"
+])
+(defn analytics-handler [connection request]
+    {
+        :status 200
+        :body "hi"
+    })
+
+(defn app
+    [connection auth-prefix request]
+    (def path (get request :path))
+    (cond
+        (find |(= path $) unresolveable-paths)
+        (handle-404)
+        (and auth-prefix (string/has-prefix? auth-prefix path))
+        (analytics-handler connection request)
+        true # Fallback
+        (pixel-handler connection request)
+        ))
 
 (defn main [& args]
     (dotenv/load-dot-env)
     (let [port (scan-number (get args 1 (or (os/getenv "PORT") "8000")))
           host (get args 2 (or (os/getenv "HOST") "localhost"))
           db-url (get args 3 (or (os/getenv "DATABASE_URL") "database.sqlite3"))
+          auth-token (os/getenv "AUTH_TOKEN")
         ]
+        (var auth-prefix nil)
+        (when auth-token
+            (set auth-prefix (string "/" auth-token "/")))
         (printf "Listening on %s:%d" host port)
         (db/migrate db-url)
         (def connection (db/connect db-url))
-        (defn loaded-app [request] (app connection request))
+        (defn loaded-app [request] (app connection auth-prefix request))
         (halo2/server loaded-app port host)
     ))

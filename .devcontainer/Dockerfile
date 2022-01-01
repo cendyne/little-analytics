@@ -4,7 +4,7 @@
 ARG VARIANT="3.15"
 FROM mcr.microsoft.com/vscode/devcontainers/base:0-alpine-${VARIANT}
 
-RUN apk add --no-cache gcc musl-dev make git build-base man-pages
+RUN apk add --no-cache gcc musl-dev make git build-base man-pages sqlite3
 WORKDIR /build
 ARG COMMIT=HEAD
 RUN git clone https://github.com/janet-lang/janet.git . && \
@@ -19,7 +19,3 @@ COPY project.janet /tmp/setup/
 WORKDIR /tmp/setup/
 RUN jpm deps
 WORKDIR /
-
-# ** [Optional] Uncomment this section to install additional packages. **
-# RUN apk update \
-#     && apk add --no-cache <your-package-list-here>
