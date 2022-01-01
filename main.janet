@@ -98,11 +98,11 @@
     (def hosts (db/query "select distinct host as `host`, count(*) as `count` from events where `date` > :date group by host" {:date now-minus-30-days}))
     (buffer/push buf "---- Unique hosts last 30 days ----\n")
     (each host hosts
-        (buffer/push buf (get host :host) ": " (string (get host :count)) "\n")
+        (buffer/push buf (or (get host :host) "?") ": " (string (get host :count)) "\n")
         )
     (buffer/push buf "\n---- Last 100 visits ----\n")
     (each {:host host} hosts
-        (buffer/push buf "------ " host " ------\n")
+        (buffer/push buf "------ " (or host "?") " ------\n")
         (each event (db/query "select * from events where `date` > :date and `host` = :host order by date desc limit 100" {:date now-minus-30-days :host host})
             (def {:ip ip :path path :date date} event)
             (def {:year year :month month :month-day day :hours hours :minutes minutes :seconds seconds} (os/date (math/floor date)))
