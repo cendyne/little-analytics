@@ -9,7 +9,7 @@
          (mapcat |(string/split "=" $ 0 2))
          (filter |(not (empty? $)))
          (map string/trim)
-         (log)
+         # (log)
          (apply table))))
 
 (defn load-dot-env []
