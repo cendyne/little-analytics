@@ -95,7 +95,7 @@
     (def buf (buffer))
     (def now (os/clock))
     (def now-minus-30-days (- now  2592000))
-    (def hosts (db/query "select distinct host as `host`, count(*) as `count` from events where `date` > :date group by host" {:date now-minus-30-days}))
+    (def hosts (db/query "select distinct host as `host`, count(*) as `count` from events where `date` > :date and host is not null group by host" {:date now-minus-30-days}))
     (buffer/push buf "---- Unique hosts last 30 days ----\n")
     (each host hosts
         (buffer/push buf (or (get host :host) "?") ": " (string (get host :count)) "\n")
