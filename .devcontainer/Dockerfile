@@ -4,7 +4,7 @@
 ARG VARIANT="3.15"
 FROM mcr.microsoft.com/vscode/devcontainers/base:0-alpine-${VARIANT}
 
-RUN apk add --no-cache gcc musl-dev make git build-base man-pages sqlite3
+RUN apk add --no-cache gcc musl-dev make git build-base man-pages sqlite
 WORKDIR /build
 ARG COMMIT=HEAD
 RUN git clone https://github.com/janet-lang/janet.git . && \

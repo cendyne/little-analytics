@@ -67,7 +67,7 @@
         (set host (string/slice path 1 second-slash))
         (set path (string/slice path second-slash)))
 
-    (printf "%f %s %s %s" date ip method path)
+    (printf "%f %s %s %s %s" date ip method host path)
     (db/insert :events {
         :date date
         :ip ip
@@ -92,9 +92,26 @@
     "/robots.txt"
 ])
 (defn analytics-handler [connection request]
+    (def buf (buffer))
+    (def now (os/clock))
+    (def now-minus-30-days (- now  2592000))
+    (def hosts (db/query "select distinct host as `host`, count(*) as `count` from events where `date` > :date group by host" {:date now-minus-30-days}))
+    (buffer/push buf "---- Unique hosts last 30 days ----\n")
+    (each host hosts
+        (buffer/push buf (get host :host) ": " (string (get host :count)) "\n")
+        )
+    (buffer/push buf "\n---- Last 100 visits ----\n")
+    (each {:host host} hosts
+        (buffer/push buf "------ " host " ------\n")
+        (each event (db/query "select * from events where `date` > :date and `host` = :host order by date desc limit 100" {:date now-minus-30-days :host host})
+            (def {:ip ip :path path :date date} event)
+            (def {:year year :month month :month-day day :hours hours :minutes minutes :seconds seconds} (os/date (math/floor date)))
+            (buffer/push buf (string/format "%04d-%02d-%02dT%02d:%02d:%02dZ " year month day hours minutes seconds))
+            (buffer/push buf ip " " path "\n"))
+        (buffer/push buf "\n"))
     {
         :status 200
-        :body "hi"
+        :body buf
     })
 
 (defn app
@@ -119,9 +136,9 @@
         (var auth-prefix nil)
         (when auth-token
             (set auth-prefix (string "/" auth-token "/")))
-        (printf "Listening on %s:%d" host port)
         (db/migrate db-url)
         (def connection (db/connect db-url))
         (defn loaded-app [request] (app connection auth-prefix request))
+        (printf "Listening on %s:%d" host port)
         (halo2/server loaded-app port host)
     ))
