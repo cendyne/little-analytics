@@ -16,6 +16,12 @@
 	// Note that some extensions may not work in Alpine Linux. See https://aka.ms/vscode-remote/linux.
 	"extensions": [],
 
+	"mounts": [
+		"source=little-analytics-data,target=/data,type=volume"
+	],
+
+	"postCreateCommand": "sudo chown vscode /data",
+
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 

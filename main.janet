@@ -3,6 +3,7 @@
 (import json)
 (import janet-html :as "html")
 (import db)
+(import ./dotenv)
 
 (def transparent (slurp "static/transparent.gif"))
 (def respond-transparent {
@@ -86,6 +87,7 @@
 )
 
 (defn main [& args]
+    (dotenv/load-dot-env)
     (let [port (scan-number (get args 1 (or (os/getenv "PORT") "8000")))
           host (get args 2 (or (os/getenv "HOST") "localhost"))
           db-url (get args 3 (or (os/getenv "DATABASE_URL") "database.sqlite3"))
