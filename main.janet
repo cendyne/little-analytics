@@ -67,7 +67,7 @@
         (set host (string/slice path 1 second-slash))
         (set path (string/slice path second-slash)))
 
-    (printf "%f %s %s %s %s" date ip method host path)
+    (printf "%f %s %s %p %s" date ip method host path)
     (db/insert :events {
         :date date
         :ip ip
@@ -122,6 +122,7 @@
         (handle-404)
         (and auth-prefix (string/has-prefix? auth-prefix path))
         (analytics-handler connection request)
+        (= "/" path) respond-transparent
         true # Fallback
         (pixel-handler connection request)
         ))
